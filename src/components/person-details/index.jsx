@@ -4,28 +4,24 @@ import SwapiService from "../../services/swapi-service"
 import "./person-details.css"
 
 const PersonDetails = ({ personId }) => {
-  const [person, setPerson] = useState({})
-
-  const didMountRef = useRef(false)
+  const [person, setPerson] = useState()
 
   const updatePerson = (personId) => {
     const swapiService = new SwapiService()
-    if (personId) {
+    if (!personId) {
       return
     }
-    swapiService.getPerson(12).then((person) => {
+    swapiService.getPerson(personId).then((person) => {
       setPerson(person)
     })
     console.log(personId, "updPerson")
   }
 
   useEffect(() => {
-    if (didMountRef.current) {
-      updatePerson()
-    } else didMountRef.current = true
+    updatePerson(personId)
   }, [personId])
 
-  if (person) {
+  if (!person) {
     return <span>Select a person from a list</span>
   }
 
@@ -40,10 +36,7 @@ const PersonDetails = ({ personId }) => {
       />
 
       <div className="card-body">
-        <h4>
-          {name}
-          {personId}
-        </h4>
+        <h4>{name}</h4>
         <ul className="list-group list-group-flush">
           <li className="list-group-item">
             <span className="term">Gender</span>
