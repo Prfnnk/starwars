@@ -1,34 +1,62 @@
 import React, { useEffect, useState } from "react"
 import SwapiService from "../../services/swapi-service"
+import Spinner from "../spinner"
+import ErrorIndicator from "../error-indicator"
 
 import "./random-planet.css"
 
 const RandomPlanet = () => {
   const [state, setState] = useState({
-    planet: {}
+    planet: {},
+    loading: true
   })
 
-  const {
-    planet: { id, name, population, rotationPeriod, diameter }
-  } = state
+  const { planet, loading, error } = state
+
+  const hasData = !(loading || error)
+
+  const spinner = loading ? <Spinner /> : null
+  const content = hasData ? <PlanetView planet={planet} /> : null
+  const errorIndicator = error ? <ErrorIndicator /> : null
 
   const swapiService = new SwapiService()
 
-  const updatePlanet = () => {
-    const id = Math.floor(Math.random() * 25) + 2
-    swapiService.getPlanet(id).then((planet) => {
-      setState({
-        planet
-      })
+  const onPlanetLoaded = (planet) => {
+    setState({
+      planet,
+      loading: false,
+      error: false
     })
+  }
+  const onError = (error) => {
+    setState({ error: true, loading: false })
+  }
+
+  const updatePlanet = () => {
+    const id = Math.floor(Math.random() * 5) + 3
+    swapiService.getPlanet(id).then(onPlanetLoaded).catch(onError)
   }
 
   useEffect(() => {
     updatePlanet()
+    setInterval(updatePlanet, 3000)
+    console.log("did mount")
   }, [])
 
   return (
     <div className="random-planet jumbotron rounded">
+      {spinner}
+      {content}
+      {errorIndicator}
+    </div>
+  )
+}
+export default RandomPlanet
+
+const PlanetView = ({ planet }) => {
+  const { id, name, population, rotationPeriod, diameter } = planet
+  return (
+    <React.Fragment>
       <img
         className="planet-image"
         src={`https://starwars-visualguide.com/assets/img/planets/${id}.jpg`}
@@ -51,7 +79,6 @@ const RandomPlanet = () => {
           </li>
         </ul>
       </div>
-    </div>
+    </React.Fragment>
   )
 }
-export default RandomPlanet
