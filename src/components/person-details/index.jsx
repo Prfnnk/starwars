@@ -1,9 +1,10 @@
-import React, { useState, useEffect, useRef } from "react"
+import React, { useState, useEffect } from "react"
 import SwapiService from "../../services/swapi-service"
+import Spinner from "../spinner"
 
 import "./person-details.css"
 
-const PersonDetails = ({ personId }) => {
+const PersonDetails = ({ personId, didUpd, setDidUpd }) => {
   const [person, setPerson] = useState()
 
   const updatePerson = (personId) => {
@@ -13,8 +14,8 @@ const PersonDetails = ({ personId }) => {
     }
     swapiService.getPerson(personId).then((person) => {
       setPerson(person)
+      setDidUpd(false)
     })
-    console.log(personId, "updPerson")
   }
 
   useEffect(() => {
@@ -25,10 +26,22 @@ const PersonDetails = ({ personId }) => {
     return <span>Select a person from a list</span>
   }
 
-  const { id, name, gender, birthYear, eyeColor } = person
+  const spinner = didUpd ? <Spinner /> : null
+  const content = !didUpd ? <DetailsContent person={person} /> : null
 
   return (
     <div className="person-details card">
+      {spinner}
+      {content}
+    </div>
+  )
+}
+export default PersonDetails
+
+const DetailsContent = ({ person }) => {
+  const { id, name, gender, birthYear, eyeColor } = person
+  return (
+    <React.Fragment>
       <img
         className="person-image"
         src={`https://starwars-visualguide.com/assets/img/characters/${id}.jpg`}
@@ -52,7 +65,6 @@ const PersonDetails = ({ personId }) => {
           </li>
         </ul>
       </div>
-    </div>
+    </React.Fragment>
   )
 }
-export default PersonDetails

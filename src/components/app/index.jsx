@@ -9,9 +9,11 @@ import "./app.css"
 
 const App = () => {
   const [selectedPerson, setSelectedPerson] = useState(null)
+  const [didUpd, setDidUpd] = useState(false)
 
   const onPersonSelected = (id) => {
     setSelectedPerson(id)
+    setDidUpd(true)
   }
 
   return (
@@ -23,7 +25,11 @@ const App = () => {
           <ItemList onItemSelected={onPersonSelected} />
         </div>
         <div className="col-md-6">
-          <PersonDetails personId={selectedPerson} />
+          <PersonDetails
+            personId={selectedPerson}
+            didUpd={didUpd}
+            setDidUpd={setDidUpd}
+          />
         </div>
       </div>
     </div>
